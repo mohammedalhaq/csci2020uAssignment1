@@ -9,12 +9,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
-import javax.swing.border.Border;
 
 public class Main extends Application {
 
@@ -23,23 +21,31 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Spam Master 3000");
 
+        //-------------------------------------------------------------------------------------------------
         //creates a TableView to view results
-        TableView tableView = new TableView();
-        tableView.setEditable(true);
+        TableView<TestFile> tableView = new TableView<>();
 
         //initializes TableView columns
-        TableColumn fileName = new TableColumn("File");
+        TableColumn<TestFile, String> fileName = new TableColumn<>("File");
         fileName.setMinWidth(280);
-        TableColumn actualClass = new TableColumn("Actual Class");
+        fileName.setCellValueFactory(new PropertyValueFactory<>("filename"));
+
+        TableColumn<TestFile, String> actualClass = new TableColumn<>("Actual Class");
         actualClass.setMinWidth(140);
-        TableColumn spamProb = new TableColumn("Spam Probability");
+        actualClass.setCellValueFactory(new PropertyValueFactory<>("actualClass"));
+
+        TableColumn<TestFile, String> spamProb = new TableColumn<>("Spam Probability");
         spamProb.setMinWidth(280);
+        spamProb.setCellValueFactory(new PropertyValueFactory<>("spamProbability"));
+
+
         //Sets the colums to the TableView
         tableView.getColumns().addAll(fileName, actualClass, spamProb);
         tableView.setPadding(new Insets(1,1,1,1));
         tableView.setMaxHeight(600);
         tableView.setTranslateY(-50); //setMaxHeight centers the table, this corrects that
 
+        //--------------------------------------------------------------------------------------------------------
         //initializes Labels and TextFields for the bottom part of the program
         Label accuracyLabel = new Label("Accuracy");
         Label precisionLabel = new Label("Precision");
@@ -48,10 +54,10 @@ public class Main extends Application {
         accuracyField.setEditable(false);                           //the accuracy should not be editable
         precisionField.setEditable(false);                          //the precision should not be editable
 
-        //creates a GridPane to lay the Labels and TextFields out
+        //creates a GridPane to lay the Labels and TextFields out nicely
         GridPane gridPane = new GridPane();
         gridPane.setPadding(new Insets(10));
-        gridPane.add(accuracyLabel, 0, 0);
+        gridPane.add(accuracyLabel, 0, 0);      //adds the labels and fields to the ui
         gridPane.add(accuracyField, 1, 0);
         gridPane.add(precisionLabel, 0, 1);
         gridPane.add(precisionField, 1, 1);
@@ -59,6 +65,8 @@ public class Main extends Application {
         gridPane.setVgap(10);
         gridPane.setTranslateY(600);
 
+
+        //TestFile testFile = new TestFile();
         //Creates a stackpane to combine the GridPane and TableView
         StackPane stackPane = new StackPane();
         stackPane.getChildren().addAll(tableView, gridPane);
@@ -76,4 +84,3 @@ public class Main extends Application {
         launch(args);
     }
 }
-
