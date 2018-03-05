@@ -6,10 +6,10 @@ import java.util.*;
 
 public class Training {
     private static int[] fileCount = {0,0}; //0 is # of spam files, 1 is # ham
+    private static TreeMap<String, Double> treeMap = new TreeMap<>();
 
 
     public static void main() {
-        TreeMap<String, Double> treeMap = new TreeMap<>();
 
         //puts the spam words and counts into a map
         File path = new File("data/train/spam");
@@ -30,7 +30,7 @@ public class Training {
 
         //iterates through the spam map to get the spam words
         //only through the spam map because if its not in the spam map then its ham guaranteed
-        for (Map.Entry<String, Integer> entry : trainSpamFreq.entrySet()){
+         for (Map.Entry<String, Integer> entry : trainSpamFreq.entrySet()){
             double wordGivenHam = 0; //0 if word isnt in Ham emails then its 0
             int spamValue = entry.getValue();
             String word = entry.getKey();
@@ -46,7 +46,7 @@ public class Training {
 
     }
 
-    public static Map<String, Integer> makeMap(File path, int i){
+    private static Map<String, Integer> makeMap(File path, int i){
         File[] files = path.listFiles();
         Map<String, Integer> map= new HashMap<>();
 
@@ -71,5 +71,9 @@ public class Training {
             }
         }
         return map;
+    }
+
+    public static TreeMap<String, Double> getMap(){
+        return treeMap;
     }
 }

@@ -21,6 +21,8 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Spam Master 3000");
 
+        Training.main();
+
         //-------------------------------------------------------------------------------------------------
         //creates a TableView to view results
         TableView<TestFile> tableView = new TableView<>();
@@ -36,10 +38,12 @@ public class Main extends Application {
 
         TableColumn<TestFile, String> spamProb = new TableColumn<>("Spam Probability");
         spamProb.setMinWidth(280);
-        spamProb.setCellValueFactory(new PropertyValueFactory<>("spamProbability"));
+        spamProb.setCellValueFactory(new PropertyValueFactory<>("spamProbRounded"));
 
 
         //Sets the colums to the TableView
+        Testing.main();
+        tableView.setItems(Testing.getFiles());
         tableView.getColumns().addAll(fileName, actualClass, spamProb);
         tableView.setPadding(new Insets(1,1,1,1));
         tableView.setMaxHeight(600);
@@ -65,16 +69,12 @@ public class Main extends Application {
         gridPane.setVgap(10);
         gridPane.setTranslateY(600);
 
-
-        //TestFile testFile = new TestFile();
         //Creates a stackpane to combine the GridPane and TableView
         StackPane stackPane = new StackPane();
         stackPane.getChildren().addAll(tableView, gridPane);
         stackPane.setTranslateY(0);
         primaryStage.setScene(new Scene(stackPane, 700, 700));
         primaryStage.show();
-
-        //Training.main();
 
     }
 
