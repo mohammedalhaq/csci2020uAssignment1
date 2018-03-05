@@ -2,51 +2,71 @@ package sample;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Training {
+    private static int[] fileCount = {0,0}; //0 is # of spam files, 1 is # ham
+
 
     public static void main() {
-        //Map<String, Integer> spamMap = new HashMap<String, Integer>();
+        TreeMap<String, Double> treeMap = new TreeMap<>();
 
+        //puts the spam words and counts into a map
         File path = new File("data/train/spam");
-        Map<String, Integer> spamMap = makeMap(path);
+        Map<String, Integer> trainSpamFreq = makeMap(path, 0);
 
+        //puts the ham words and counts into a map
         path = new File("data/train/ham");
-        Map<String, Integer> hamMap1 = makeMap(path);
+        Map<String, Integer> hamMap1 = makeMap(path, 1);
 
+        //puts the ham words from the other directory into another map
         path = new File("data/train/ham2");
-        Map<String, Integer> hamMap2 = makeMap(path);
+        Map<String, Integer> hamMap2 = makeMap(path, 1);
 
-        Map<String, Integer> hamMap= new HashMap<>();
-        hamMap.putAll(hamMap1);
-        hamMap.putAll(hamMap2);
+        //combines both ham maps
+        Map<String, Integer> trainHamFreq = new HashMap<>();
+        trainHamFreq.putAll(hamMap1);
+        trainHamFreq.putAll(hamMap2);
 
+        //iterates through the spam map to get the spam words
+        //only through the spam map because if its not in the spam map then its ham guaranteed
+        for (Map.Entry<String, Integer> entry : trainSpamFreq.entrySet()){
+            double wordGivenHam = 0; //0 if word isnt in Ham emails then its 0
+            int spamValue = entry.getValue();
+            String word = entry.getKey();
+            if (trainHamFreq.containsKey(word)){
+                int hamValue = trainHamFreq.get(word);
+                wordGivenHam = (double) hamValue/fileCount[1];
+            }
+            double wordGivenSpam = (double) spamValue/fileCount[0];
+            double spamGivenWord = (wordGivenSpam)/(wordGivenHam+wordGivenSpam);
+            //puts the calculated spamGivenWord into the treeMap with the word
+            treeMap.put(word, spamGivenWord);
+        }
 
     }
 
-    public static Map<String, Integer> makeMap(File path){
+    public static Map<String, Integer> makeMap(File path, int i){
         File[] files = path.listFiles();
         Map<String, Integer> map= new HashMap<>();
 
-        for (File file : files) {
+        for (File file : files) { //iterates through the files in the directory
+            fileCount[i]++;
             try {
-                System.out.println(file);
                 Scanner scanner = new Scanner(file);
-                scanner.useDelimiter("[^0-9]");
-                while (scanner.hasNext()) {
+                scanner.useDelimiter("[ ;^0-9.\n   ]"); //the chars that split words
+                while (scanner.hasNext()){
                     String word = scanner.next();
-                    word = word.toLowerCase();
-                    if (map.containsKey(word)) {
+                    word = word.toLowerCase(); //case dose not matter
+                    if (map.containsKey(word)) { //adds 1 if the words is already in the map
                         int count = map.get(word) + 1;
                         map.put(word, count);
-                    } else {
+                    } else { //puts the first appearance into the map
                         map.put(word, 1);
                     }
                 }
             } catch (FileNotFoundException e) {
+                System.out.println("File not Found");
                 e.printStackTrace();
             }
         }
