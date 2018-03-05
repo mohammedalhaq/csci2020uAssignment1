@@ -12,7 +12,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+
+import java.io.File;
 
 public class Main extends Application {
 
@@ -21,7 +24,13 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Spam Master 3000");
 
-        Training.main();
+        //creates a directory chooser to ask the user to locate their data folder
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setInitialDirectory(new File("."));
+        File directory = directoryChooser.showDialog(primaryStage);
+
+        //Runs the training algorithm on the directory if the treemap file does not exist
+        Training.main(directory);
 
         //-------------------------------------------------------------------------------------------------
         //creates a TableView to view results
@@ -42,7 +51,7 @@ public class Main extends Application {
 
 
         //Sets the colums to the TableView
-        Testing.main();
+        Testing.main(directory);
         tableView.setItems(Testing.getFiles());
         tableView.getColumns().addAll(fileName, actualClass, spamProb);
         tableView.setPadding(new Insets(1,1,1,1));
@@ -54,7 +63,9 @@ public class Main extends Application {
         Label accuracyLabel = new Label("Accuracy");
         Label precisionLabel = new Label("Precision");
         TextField accuracyField = new TextField();
+        accuracyField.setText(Testing.getAccuracy());
         TextField precisionField= new TextField();
+        precisionField.setText(Testing.getPrecision());
         accuracyField.setEditable(false);                           //the accuracy should not be editable
         precisionField.setEditable(false);                          //the precision should not be editable
 

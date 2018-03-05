@@ -2,6 +2,7 @@ package sample;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.*;
 
 public class Training {
@@ -9,18 +10,18 @@ public class Training {
     private static TreeMap<String, Double> treeMap = new TreeMap<>();
 
 
-    public static void main() {
+    public static void main(File directory) throws FileNotFoundException {
 
         //puts the spam words and counts into a map
-        File path = new File("data/train/spam");
+        File path = new File(directory + "/train/spam");
         Map<String, Integer> trainSpamFreq = makeMap(path, 0);
 
         //puts the ham words and counts into a map
-        path = new File("data/train/ham");
+        path = new File(directory + "/train/ham");
         Map<String, Integer> hamMap1 = makeMap(path, 1);
 
         //puts the ham words from the other directory into another map
-        path = new File("data/train/ham2");
+        path = new File(directory + "/train/ham2");
         Map<String, Integer> hamMap2 = makeMap(path, 1);
 
         //combines both ham maps
@@ -43,27 +44,32 @@ public class Training {
             //puts the calculated spamGivenWord into the treeMap with the word
             treeMap.put(word, spamGivenWord);
         }
-
     }
 
     private static Map<String, Integer> makeMap(File path, int i){
-        File[] files = path.listFiles();
+        File[] files = path.listFiles(); //puts all the files into an array to iterate through
         Map<String, Integer> map= new HashMap<>();
 
         for (File file : files) { //iterates through the files in the directory
             fileCount[i]++;
             try {
                 Scanner scanner = new Scanner(file);
-                scanner.useDelimiter("[ ;^0-9.\n   ]"); //the chars that split words
+                scanner.useDelimiter("[ ;^0-9.\n:\t!?/]"); //the chars that split words
+                Set<String> words = new TreeSet<>();
                 while (scanner.hasNext()){
                     String word = scanner.next();
                     word = word.toLowerCase(); //case dose not matter
-                    if (map.containsKey(word)) { //adds 1 if the words is already in the map
-                        int count = map.get(word) + 1;
-                        map.put(word, count);
-                    } else { //puts the first appearance into the map
-                        map.put(word, 1);
+                    if (isWord(word)) {
+                        if (!words.contains(word)) {
+                            if (map.containsKey(word)) { //adds 1 if the words is already in the map
+                                int count = map.get(word) + 1;
+                                map.put(word, count);
+                            } else { //puts the first appearance into the map
+                                map.put(word, 1);
+                            }
+                        }
                     }
+
                 }
             } catch (FileNotFoundException e) {
                 System.out.println("File not Found");
@@ -75,5 +81,15 @@ public class Training {
 
     public static TreeMap<String, Double> getMap(){
         return treeMap;
+    }
+
+    //Function referenced from Randy Fortier
+    private static boolean isWord(String token) {
+        String pattern = "^[a-zA-Z]*$";
+        if (token.matches(pattern)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
