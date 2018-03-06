@@ -12,7 +12,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+
+import java.io.File;
 
 public class Main extends Application {
 
@@ -20,6 +23,14 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Spam Master 3000");
+
+        //creates a directory chooser to ask the user to locate their data folder
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setInitialDirectory(new File("."));
+        File directory = directoryChooser.showDialog(primaryStage);
+
+        //Runs the training algorithm on the directory if the treemap file does not exist
+        Training.main(directory);
 
         //-------------------------------------------------------------------------------------------------
         //creates a TableView to view results
@@ -36,10 +47,12 @@ public class Main extends Application {
 
         TableColumn<TestFile, String> spamProb = new TableColumn<>("Spam Probability");
         spamProb.setMinWidth(280);
-        spamProb.setCellValueFactory(new PropertyValueFactory<>("spamProbability"));
+        spamProb.setCellValueFactory(new PropertyValueFactory<>("spamProbRounded"));
 
 
         //Sets the colums to the TableView
+        Testing.main(directory);
+        tableView.setItems(Testing.getFiles());
         tableView.getColumns().addAll(fileName, actualClass, spamProb);
         tableView.setPadding(new Insets(1,1,1,1));
         tableView.setMaxHeight(600);
@@ -50,7 +63,9 @@ public class Main extends Application {
         Label accuracyLabel = new Label("Accuracy");
         Label precisionLabel = new Label("Precision");
         TextField accuracyField = new TextField();
+        accuracyField.setText(Testing.getAccuracy());
         TextField precisionField= new TextField();
+        precisionField.setText(Testing.getPrecision());
         accuracyField.setEditable(false);                           //the accuracy should not be editable
         precisionField.setEditable(false);                          //the precision should not be editable
 
@@ -65,16 +80,12 @@ public class Main extends Application {
         gridPane.setVgap(10);
         gridPane.setTranslateY(600);
 
-
-        //TestFile testFile = new TestFile();
         //Creates a stackpane to combine the GridPane and TableView
         StackPane stackPane = new StackPane();
         stackPane.getChildren().addAll(tableView, gridPane);
         stackPane.setTranslateY(0);
         primaryStage.setScene(new Scene(stackPane, 700, 700));
         primaryStage.show();
-
-        //Training.main();
 
     }
 

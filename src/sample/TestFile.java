@@ -6,6 +6,7 @@ public class TestFile {
     private String filename;
     private double spamProbability;
     private String actualClass;
+    private String spamProbRounded;
 
     public TestFile(String filename,
                     double spamProbability,
@@ -13,6 +14,7 @@ public class TestFile {
         this.filename = filename;
         this.spamProbability = spamProbability;
         this.actualClass = actualClass;
+        this.spamProbRounded = getSpamProbRounded();
     }
 
     public String getFilename() { return this.filename; }
